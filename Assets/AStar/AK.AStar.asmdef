@@ -1,0 +1,16 @@
+{
+    "name": "AK.AStar",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8f45ec00c2caf43478846ddf84719947"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

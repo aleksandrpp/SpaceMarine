@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 908fdbd423fd490391932ff4ac6e26ae, type: 3}
+  m_Name: SO_UI
+  m_EditorClassIdentifier: 
+  BarView: {fileID: 1273146897415469391, guid: 441750e1be17f6c40b0755d9a885afd4, type: 3}
+  TrackerView: {fileID: 2353772643467019996, guid: cae5f27237e002b44a5250e2b6cb998a,
+    type: 3}
+  LabelView: {fileID: 5951056574564396646, guid: 4eb7de127ee14f044bac4423079071bb,
+    type: 3}

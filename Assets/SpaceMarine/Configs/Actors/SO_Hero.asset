@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db84a88e81704aefa675248dbc765012, type: 3}
+  m_Name: SO_Hero
+  m_EditorClassIdentifier: 
+  View: {fileID: 5800435607362337807, guid: 5fba35b79e5ed764babafc7a90f9e824, type: 3}
+  GunConfigs:
+  - {fileID: 11400000, guid: 8cbf0995f9683cd4f9ae278b25d35a55, type: 2}
+  - {fileID: 11400000, guid: 702bb2f79ff6c5342bdefb5a279541d9, type: 2}
+  HpDefault: 1000
+  MoveSpeed: 3.6
+  DieDelay: 1
+  RotationSpeed: 6.5

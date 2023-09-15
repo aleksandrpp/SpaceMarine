@@ -1,0 +1,22 @@
+{
+    "name": "AK.SpaceMarine",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "GUID:4307f53044263cf4b835bd812fc161a4",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:62e64d4ef01cb9c43874b81f0b3d51ca",
+        "GUID:474f04f397f1eca44949d4130aab08e0",
+        "GUID:82e54ea5709d17941813f892969f2c4d",
+        "GUID:8f45ec00c2caf43478846ddf84719947"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

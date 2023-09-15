@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfcbcfeecd1f49c8af8a09a3def43174, type: 3}
+  m_Name: SO_Outpost
+  m_EditorClassIdentifier: 
+  View: {fileID: 8138912599371393682, guid: 56cb1887d96a7444ea74870f627f5a79, type: 3}
+  EnemyConfigs:
+  - {fileID: 11400000, guid: e54f7c3e13b21634ca485b942340b301, type: 2}
+  - {fileID: 11400000, guid: 17450967f1d7283489dd6585bf6c87e9, type: 2}
+  HpDefault: 1000
+  XpReward: 1
+  SpawnRate: 1
+  SpawnLimit: 200

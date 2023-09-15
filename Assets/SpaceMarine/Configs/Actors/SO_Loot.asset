@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c5c283b34af4d829f8d84feca2dcfb5, type: 3}
+  m_Name: SO_Loot
+  m_EditorClassIdentifier: 
+  View: {fileID: 131203483910595746, guid: 486b8fe88e5af2f4cbb2dc5fcc63e162, type: 3}
+  PickupRange: 1
+  Amount: 50
