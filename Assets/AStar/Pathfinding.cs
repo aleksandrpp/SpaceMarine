@@ -24,7 +24,7 @@ namespace AK.AStar
         public Pathfinding(IGrid grid)
         {
             Grid = grid;
-            
+
             var maxPath = (int)Mathf.Sqrt(Mathf.Pow(Grid.Dimension.x, 2) + Mathf.Pow(Grid.Dimension.y, 2)) * 2;
             _open = new FastPriorityQueue<Tile>(maxPath);
             
@@ -42,10 +42,12 @@ namespace AK.AStar
                 return Status.InvalidPosition;
 
             if (start.Cost < 0)
-                start = Grid.GetAvailable(start);
+                if (!Grid.TryGetAvailable(start))
+                    return Status.InvalidPosition;
 
             if (end.Cost < 0)
-                end = Grid.GetAvailable(end);
+                if (!Grid.TryGetAvailable(end))
+                    return Status.InvalidPosition;
 
             if (start.Equals(end))
                 return Status.StartIsEnd;

@@ -13,7 +13,7 @@ namespace AK.AStar
 
         void GetNeighbours(Tile tile, List<Tile> neighbours);
 
-        Tile GetAvailable(Tile tile);
+        bool TryGetAvailable(Tile tile);
 
         void Build();
 

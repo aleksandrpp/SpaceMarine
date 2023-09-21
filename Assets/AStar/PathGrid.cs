@@ -5,6 +5,8 @@ namespace AK.AStar
 {
     public class PathGrid : IGrid
     {
+        private const int MaxAvailableIterations = 10;
+        
         public Vector2Int Dimension { get; private set; }
 
         private GridConfig _config;
@@ -88,20 +90,25 @@ namespace AK.AStar
             }
         }
 
-        public Tile GetAvailable(Tile tile)
+        public bool TryGetAvailable(Tile tile)
         {
-            var neighbours = new List<Tile>();
-            GetNeighbours(tile, neighbours);
+            var iterations = 0;
 
-            Tile neighbour = null;
-            foreach (var t in neighbours)
+            while (iterations < MaxAvailableIterations)
             {
-                neighbour = t;
-                if (t.Cost >= 0)
-                    return neighbour;
+                var neighbours = new List<Tile>();
+                GetNeighbours(tile, neighbours);
+                
+                foreach (var t in neighbours)
+                {
+                    tile = t;
+                    if (t.Cost >= 0) return true;
+                }
+                
+                iterations++;
             }
 
-            return GetAvailable(neighbour);
+            return false;
         }
 
         public void Debug()
