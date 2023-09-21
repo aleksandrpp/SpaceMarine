@@ -1,10 +1,10 @@
-﻿namespace AK.BehaviourTree
+namespace AK.BehaviourTree
 {
+    public delegate Status Action();
+
     public enum Status
     {
-        None,
-        Running,
-        Success,
-        Failure
+        Failure,
+        Success
     }
 }

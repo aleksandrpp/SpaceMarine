@@ -1,32 +1,25 @@
-﻿using System.Collections.Generic;
-
-namespace AK.BehaviourTree
+﻿namespace AK.BehaviourTree
 {
     public class Selector : Composite
     {
-        public Selector(ICollection<Node> nodes) : base(nodes)
+        public Selector(INode[] nodes) : base(nodes)
         {
         }
-
-        protected override Status Execute()
+        
+        public override Status Execute()
         {
-            foreach (var node in Nodes)
+            foreach (INode node in Nodes)
             {
-                switch (node.Traverse())
+                switch (node.Execute())
                 {
                     case Status.Failure:
                         continue;
                     case Status.Success:
-                        Status = Status.Success;
-                        return Status;
-                    case Status.Running:
-                        Status = Status.Running;
-                        return Status;
+                        return Status.Success;
                 }
             }
             
-            Status = Status.Failure;
-            return Status;
+            return Status.Failure;
         }
     }
 }

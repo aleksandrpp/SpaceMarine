@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
-
 namespace AK.BehaviourTree
 {
-    public abstract class Composite : Node
+    public abstract class Composite : INode
     {
-        protected ICollection<Node> Nodes;
-        
-        protected Composite(ICollection<Node> nodes)
+        protected INode[] Nodes;
+
+        protected Composite(INode[] nodes)
         {
             Nodes = nodes;
         }
+        
+        public abstract Status Execute();
     }
 }
