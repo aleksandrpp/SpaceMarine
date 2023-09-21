@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace AK.SpaceMarine.UI
@@ -10,21 +9,32 @@ namespace AK.SpaceMarine.UI
         protected TView View;
         
         protected Dictionary<TPart, (TView view, int timestamp)> Parts = new();
+        
+        private List<TPart> _partsToRemove;
 
         protected Widget(Canvas canvas, TView view)
         {
             Canvas = canvas;
             View = view;
+
+            _partsToRemove = new List<TPart>();
         }
 
         public void Cleanup()
         {
-            foreach (var state in Parts.ToList())
+            _partsToRemove.Clear();
+            
+            foreach (var state in Parts)
                 if (state.Value.timestamp != Time.frameCount)
                 {
                     Object.Destroy(state.Value.view.gameObject);
-                    Parts.Remove(state.Key);
+                    _partsToRemove.Add(state.Key);
                 }
+
+            foreach (var part in _partsToRemove)
+            {
+                Parts.Remove(part);
+            }
         }
 
         public void Disable()
