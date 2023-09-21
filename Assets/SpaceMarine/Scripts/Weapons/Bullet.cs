@@ -54,7 +54,10 @@ namespace AK.SpaceMarine.Weapons
                 Verlet();
 
             _lifetimeProgress -= Time.deltaTime;
+        }
 
+        private void FixedUpdate()
+        {
             if (Overlap() || _lifetimeProgress <= 0 || transform.position.y < -1)
                 ReleaseBullet();
         }

@@ -1,5 +1,5 @@
-﻿using AK.BehaviourTree;
-using AK.SpaceMarine.Parts;
+﻿using AK.SpaceMarine.Parts;
+using AK.BehaviourTree;
 using UnityEngine;
 
 namespace AK.SpaceMarine.Actors
@@ -11,7 +11,7 @@ namespace AK.SpaceMarine.Actors
         private IWorld _world;
         private OutpostConfig _config;
         private float _hp, _spawnCooldown;
-        private INode _tree;
+        private Composite _tree;
 
         public override void Bind(IWorld world)
         {
@@ -43,25 +43,25 @@ namespace AK.SpaceMarine.Actors
         {
             _hp = _config.HpDefault;
             _tree = new Sequence(
-                new Node[]
+                new INode[]
                 {
-                    new(Alive),
-                    new(CheckHero),
-                    new(SpawnEnemy)
+                    new Leaf(Alive),
+                    new Leaf(CheckHero),
+                    new Leaf(SpawnEnemy)
                 }
             );
         }
 
         private void FixedUpdate()
         {
-            _tree.Traverse();
+            _tree.Execute();
         }
         
         private Status Alive()
         {
             if (_hp > 0)
                 return Status.Success;
-
+            
             _world.Remove(this);
 
             return Status.Failure;

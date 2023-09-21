@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using AK.AStar;
-using AK.BehaviourTree;
 using AK.SpaceMarine.Parts;
 using AK.SpaceMarine.Weapons;
+using AK.BehaviourTree;
 using UnityEngine;
-using INode = AK.BehaviourTree.INode;
 using Random = UnityEngine.Random;
 using Status = AK.BehaviourTree.Status;
 
@@ -19,7 +18,7 @@ namespace AK.SpaceMarine.Actors
         private IPathfinding _pathfinding;
         private EnemyConfig _config;
         private float _hp, _shootCooldown, _pathCooldown, _pathProgress;
-        private INode _tree;
+        private Composite _tree;
         private List<Tile> _path;
         private Tile _occupationTile;
 
@@ -88,32 +87,26 @@ namespace AK.SpaceMarine.Actors
             _path = new List<Tile>();
 
             _tree = new Sequence(
-                new Node[]
+                new INode[]
                 {
-                    new(Alive),
-                    new(Reload),
-                    new(CheckHero),
+                    new Leaf(Alive),
+                    new Leaf(Reload),
+                    new Leaf(CheckHero),
                     new Selector(
-                        new Node[]
+                        new INode[]
                         {
-                            new(EyeContact),
-                            new(ChaseHero)
+                            new Leaf(CheckDistance),
+                            new Leaf(ChaseHero)
                         }),
-                    new Selector(
-                        new Node[]
-                        {
-                            new(CheckDistance),
-                            new(ChaseHero)
-                        }),
-                    new(EyeContact),
-                    new(Attack)
+                    new Leaf(EyeContact),
+                    new Leaf(Attack)
                 }
             );
         }
 
         private void FixedUpdate()
         {
-            _tree.Traverse();
+            _tree.Execute();
         }
 
         private Vector3 _velocity;
@@ -172,23 +165,23 @@ namespace AK.SpaceMarine.Actors
         {
             _pathCooldown -= Time.deltaTime;
             _pathProgress += Time.deltaTime * _config.PathSpeed;
-            
-            if (_pathCooldown > 0)
-                return Status.Running;
-            
-            if (_pathfinding.CreatePath(Position, _world.Hero.Position, _path) == 0)
+
+            if (_pathCooldown < 0)
             {
-                _pathCooldown = 1 / _config.PathRate;
-                _pathProgress = 1;
+                if (_pathfinding.CreatePath(Position, _world.Hero.Position, _path) == 0)
+                {
+                    _pathCooldown = 1 / _config.PathRate;
+                    _pathProgress = 1;
+                }
             }
 
-            return Status.Running;
+            return Status.Failure;
         }
 
         private Status CheckDistance()
         {
             var direction = GetDirection(_world.Hero);
-
+            
             if (direction.magnitude <= Gun.Config.Range)
                 return Status.Success;
 
@@ -217,7 +210,7 @@ namespace AK.SpaceMarine.Actors
         private Status Attack()
         {
             if (_shootCooldown > 0)
-                return Status.Running;
+                return Status.Failure;
 
             _shootCooldown = 1 / GunConfig.Rate;
 

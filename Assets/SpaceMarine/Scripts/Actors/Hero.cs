@@ -1,6 +1,6 @@
-using AK.BehaviourTree;
 using AK.SpaceMarine.Parts;
 using AK.SpaceMarine.Weapons;
+using AK.BehaviourTree;
 using UnityEngine;
 
 namespace AK.SpaceMarine.Actors
@@ -20,7 +20,7 @@ namespace AK.SpaceMarine.Actors
         private int _loadOutIndex;
         private Quaternion _targetRotation;
         private Vector3 _lookPosition;
-        private INode _tree;
+        private Composite _tree;
 
         #region Bindings
         
@@ -85,21 +85,21 @@ namespace AK.SpaceMarine.Actors
             _hp = _config.HpDefault;
             
             _tree = new Sequence(
-                new Node[]
+                new INode[]
                 {
                     new Selector(
-                        new Node[]
+                        new INode[]
                         {
-                            new(Alive),
-                            new(Die)
+                            new Leaf(Alive),
+                            new Leaf(Die)
                         }
                     ),
-                    new(CheckLoot),
-                    new(Reload),
-                    new(Follow),
-                    new(GetEnemy),
-                    new(TakeAim),
-                    new(Shoot)
+                    new Leaf(CheckLoot),
+                    new Leaf(Reload),
+                    new Leaf(Follow),
+                    new Leaf(GetEnemy),
+                    new Leaf(TakeAim),
+                    new Leaf(Shoot)
                 }
             );
         }
@@ -123,7 +123,7 @@ namespace AK.SpaceMarine.Actors
 
         private void FixedUpdate()
         {
-            _tree.Traverse();
+            _tree.Execute();
             
             var move = _input.Move * (_config.MoveSpeed * Time.deltaTime);
             var delta = Vector3.right * move.x + Vector3.forward * move.y;
@@ -140,7 +140,7 @@ namespace AK.SpaceMarine.Actors
                 return Status.Success;
             
             if (_lastBreath) 
-                return Status.Running;
+                return Status.Failure;
 
             return Status.Failure;
         }
@@ -219,7 +219,7 @@ namespace AK.SpaceMarine.Actors
         private Status Shoot()
         {
             if (_shootCooldown > 0)
-                return Status.Running;
+                return Status.Failure;
 
             _shootCooldown = 1 / GunConfig.Rate;
             
