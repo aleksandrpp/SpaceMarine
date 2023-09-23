@@ -61,8 +61,12 @@ namespace AK.AStar
             _cost.Clear();
             _cost.Add(start, 0);
 
-            while (_open.Count > 0)
+            int i = 250; // under construction
+            
+            while (_open.Count > 0 || i > 0)
             {
+                i--;
+                
                 var current = _open.Dequeue();
                 if (current.Equals(end))
                 {

@@ -10,7 +10,7 @@ namespace AK.SpaceMarine.Weapons
             Position = position;
             Range = range;
         }
-        
+
         public Vector3 Position { get; }
         public float Range { get; }
     }

@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace AK.SpaceMarine.Actors
 {
     [DisallowMultipleComponent]
-    public abstract class Actor : MonoBehaviour, System.IDisposable, System.IEquatable<Transform>
+    public abstract class Actor : MonoBehaviour, IDisposable, IEquatable<Transform>
     {
         private int _lastPositionCache;
         private Vector3 _position;
@@ -62,9 +64,7 @@ namespace AK.SpaceMarine.Actors
         public virtual void Dispose()
         {
             if (gameObject != null)
-            {
                 Destroy(gameObject);
-            }
         }
 
         public bool Equals(Transform other)

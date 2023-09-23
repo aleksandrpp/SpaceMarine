@@ -1,3 +1,4 @@
+using System;
 using AK.SpaceMarine.Parts;
 using AK.SpaceMarine.Weapons;
 using AK.BehaviourTree;
@@ -14,21 +15,25 @@ namespace AK.SpaceMarine.Actors
         private HeroConfig _config;
         private IWorld _world;
         private IInput _input;
-        private IDamageable _currentEnemy;
+        
         private bool _lastBreath;
         private float _shootCooldown, _hp;
         private int _loadOutIndex;
         private Quaternion _targetRotation;
         private Vector3 _lookPosition;
         private Composite _tree;
+        private IDamageable _currentEnemy;
+        
+        private Predicate<IPickable> _lootPredicate;
+        private Predicate<IDamageable> _enemyPredicate;
 
         #region Bindings
-        
+
         public override void Bind(IWorld world)
         {
             _world = world;
         }
-        
+
         public void Bind(HeroConfig config)
         {
             _config = config;
@@ -40,33 +45,29 @@ namespace AK.SpaceMarine.Actors
         {
             _input = input;
         }
-        
-        #endregion
 
-        #region IGunner
-
-        public GunConfig GunConfig { get; private set; }
-        
-        public Gun Gun { get; private set; }
-        
-        public Transform GunRoot => _gunRoot;
-        
-        public float Range => GunConfig.Range;
-        
         #endregion
 
         #region Parts
-        
+
+        public GunConfig GunConfig { get; private set; }
+
+        public Gun Gun { get; private set; }
+
+        public Transform GunRoot => _gunRoot;
+
+        public float Range => GunConfig.Range;
+
         public bool Active => !_lastBreath;
 
         public Vector3 HitPoint => _bodyCenter.position;
-        
+
         public void ReceiveHit(float damage)
         {
             _hp = Mathf.Max(0, _hp - damage);
         }
-        
-        public string LabelText => $"{(int)_hp}";
+
+        public string LabelText => $"{(int) _hp}";
 
         public void Heal(float amount)
         {
@@ -77,13 +78,16 @@ namespace AK.SpaceMarine.Actors
 
         private void Start()
         {
+            _lootPredicate = pickable => (pickable.Position - Position).magnitude <= pickable.Range;
+            _enemyPredicate = damageable => (damageable.Position - Position).magnitude <= Range && !damageable.Equals(Transform);
+
             SetLoadout();
             _input.BindLoadout(SetLoadout);
 
             _lookPosition = Position;
             _targetRotation = Rotation;
             _hp = _config.HpDefault;
-            
+
             _tree = new Sequence(
                 new INode[]
                 {
@@ -103,12 +107,12 @@ namespace AK.SpaceMarine.Actors
                 }
             );
         }
-        
+
         private void SetLoadout()
         {
             if (Gun != null)
                 Destroy(Gun.gameObject);
-            
+
             GunConfig = _config.GunConfigs[_loadOutIndex++ % _config.GunConfigs.Length];
             Gun = GunConfig.Create(_world, this);
             Loadout = Gun.GetType().Name;
@@ -124,22 +128,22 @@ namespace AK.SpaceMarine.Actors
         private void FixedUpdate()
         {
             _tree.Execute();
-            
+
             var move = _input.Move * (_config.MoveSpeed * Time.deltaTime);
             var delta = Vector3.right * move.x + Vector3.forward * move.y;
-            
+
             _lookPosition = Position + delta * 2;
             _controller.Move(delta + Vector3.down * .1f);
         }
-        
+
         #region Behaviour
 
         private Status Alive()
         {
-            if (_hp > 0) 
+            if (_hp > 0)
                 return Status.Success;
-            
-            if (_lastBreath) 
+
+            if (_lastBreath)
                 return Status.Failure;
 
             return Status.Failure;
@@ -155,14 +159,9 @@ namespace AK.SpaceMarine.Actors
 
         private Status CheckLoot()
         {
-            if (_world.TryGetActorFirst(Loot, out IPickable result))
+            if (_world.TryGetActorFirst(_lootPredicate, out IPickable result))
             {
                 result.Pickup(this);
-            }
-
-            bool Loot(IPickable pickable)
-            {
-                return (pickable.Position - Position).magnitude <= pickable.Range;
             }
 
             return Status.Success;
@@ -177,16 +176,10 @@ namespace AK.SpaceMarine.Actors
 
         private Status GetEnemy()
         {
-            if (!_world.TryGetActorNearest(this, Enemy, out IDamageable result))
+            if (!_world.TryGetActorNearest(this, _enemyPredicate, out IDamageable result))
             {
                 _currentEnemy = null;
                 return Status.Failure;
-            }
-
-            bool Enemy(IDamageable damageable)
-            {
-                return (damageable.Position - Position).magnitude <= Range &&
-                       !damageable.Equals(Transform);
             }
 
             _currentEnemy = result;
@@ -198,7 +191,7 @@ namespace AK.SpaceMarine.Actors
 
         private Status TakeAim()
         {
-            if (Physics.Raycast(_bodyCenter.position, _bodyCenter.forward, out var hit, 
+            if (Physics.Raycast(_bodyCenter.position, _bodyCenter.forward, out var hit,
                     Gun.Config.Range, Physics.AllLayers, QueryTriggerInteraction.Collide))
             {
                 if (_currentEnemy.Equals(hit.transform))
@@ -222,7 +215,7 @@ namespace AK.SpaceMarine.Actors
                 return Status.Failure;
 
             _shootCooldown = 1 / GunConfig.Rate;
-            
+
             Gun.Fire();
 
             return Status.Success;

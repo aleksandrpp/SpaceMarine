@@ -9,7 +9,7 @@ namespace AK.SpaceMarine.Weapons
     {
         private IWorld _world;
         private BulletConfig _config;
-        
+
         private ICollection<GameObject> _objects;
         private IObjectPool<Bullet> _bullets;
 
@@ -17,9 +17,9 @@ namespace AK.SpaceMarine.Weapons
         {
             _world = world;
             _config = config;
-            
+
             _objects = new HashSet<GameObject>();
-            _bullets = new ObjectPool<Bullet>(CreatePooledItem, OnGet, OnRelease, OnDestroy, 
+            _bullets = new ObjectPool<Bullet>(CreatePooledItem, OnGet, OnRelease, OnDestroy,
                 true, config.PoolSize, config.PoolSize);
         }
 
@@ -27,7 +27,7 @@ namespace AK.SpaceMarine.Weapons
         {
             var bullet = Object.Instantiate(_config.View);
             bullet.Bind(_world, _config);
-            
+
             _objects.Add(bullet.gameObject);
             return bullet;
         }

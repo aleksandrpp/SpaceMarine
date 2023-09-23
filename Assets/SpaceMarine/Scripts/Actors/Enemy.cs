@@ -21,6 +21,7 @@ namespace AK.SpaceMarine.Actors
         private Composite _tree;
         private List<Tile> _path;
         private Tile _occupationTile;
+        private Vector3 _velocity;
 
         #region Bindings
 
@@ -41,16 +42,12 @@ namespace AK.SpaceMarine.Actors
 
         #endregion
 
-        #region IGunner
+        #region Parts
 
         public GunConfig GunConfig => _config.GunConfig;
         public Gun Gun { get; private set; }
         public Transform GunRoot => _gunRoot;
         public float Range => GunConfig.Range;
-
-        #endregion
-
-        #region Parts
 
         public float BarAmount => _hp / _config.HpDefault;
 
@@ -109,8 +106,6 @@ namespace AK.SpaceMarine.Actors
             _tree.Execute();
         }
 
-        private Vector3 _velocity;
-        
         private void Update()
         {
             var pathProgress = Mathf.RoundToInt(_pathProgress);

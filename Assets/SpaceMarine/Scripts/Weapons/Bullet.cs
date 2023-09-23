@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AK.SpaceMarine.Parts;
 using UnityEngine;
 
 namespace AK.SpaceMarine.Weapons
 {
+    /* Not pretty but compact and complex */
+
     [DisallowMultipleComponent]
     public class Bullet : MonoBehaviour
     {
@@ -18,20 +21,28 @@ namespace AK.SpaceMarine.Weapons
         private Perks _flags;
         private List<IDamageable> _ignore;
 
+        private IDamageable _ricochetTarget;
+        private Transform _targetTransform;
+        private Predicate<IDamageable> _targetPredicate;
+        private Predicate<IDamageable> _ricochetPredicate;
+
         public void Bind(IWorld world, BulletConfig config)
         {
             _world = world;
             _config = config;
-            
+
             _overlapColliders = new Collider[_config.OverlapCount];
             _ignore = new List<IDamageable>();
+
+            _targetPredicate = damageable => !_ignore.Contains(damageable) && damageable.Equals(_targetTransform);
+            _ricochetPredicate = damageable => !_ignore.Contains(damageable) && !damageable.Equals(_ricochetTarget.Transform);
         }
 
         public void Launch(Vector3 position, Quaternion rotation, IGunner gunner, Vector3 direction, float range, float speed, Perks flags, List<IDamageable> ignore = null)
         {
             transform.SetPositionAndRotation(position, rotation);
             Trail(true);
-            
+
             _gunner = gunner;
             _lastPosition = position;
             _direction = direction;
@@ -80,6 +91,7 @@ namespace AK.SpaceMarine.Weapons
         private bool Overlap()
         {
             var count = Physics.OverlapSphereNonAlloc(transform.position, _config.OverlapRadius, _overlapColliders);
+
             for (int i = 0; i < count; i++)
             {
                 var t = _overlapColliders[i].transform;
@@ -90,16 +102,13 @@ namespace AK.SpaceMarine.Weapons
                     return true;
                 }
 
-                if (_world.TryGetActorFirst(Damageable, out IDamageable result))
+                _targetTransform = t;
+
+                if (_world.TryGetActorFirst(_targetPredicate, out IDamageable result))
                 {
                     Hit(result);
-                    Ricochet(result.HitPoint, t);
+                    Ricochet(result);
                     return true;
-                }
-
-                bool Damageable(IDamageable actor)
-                {
-                    return !_ignore.Contains(actor) && actor.Equals(t);
                 }
             }
 
@@ -118,28 +127,25 @@ namespace AK.SpaceMarine.Weapons
             GetBullet(transform.position, Vector3.Reflect(_direction, hit.normal));
         }
 
-        private void Hit(IDamageable damageable)
+        private void Hit(IDamageable target)
         {
-            damageable.ReceiveHit(_gunner.GunConfig.Damage);
-            _ignore.Add(damageable);
+            target.ReceiveHit(_gunner.GunConfig.Damage);
+            _ignore.Add(target);
         }
 
-        private void Ricochet(Vector3 hitPoint, Transform hitTransform)
+        private void Ricochet(IDamageable target)
         {
             if (!UsePerk(ref _flags, Perks.Ricochet))
                 return;
 
-            if (!_world.TryGetActorNearest(new CustomRange(hitPoint, _range), Damageable, out IDamageable closeEnemy))
+            _ricochetTarget = target;
+
+            if (!_world.TryGetActorNearest(new CustomRange(target.HitPoint, _range), _ricochetPredicate, out IDamageable closeEnemy))
                 return;
 
-            bool Damageable(IDamageable actor)
-            {
-                return !_ignore.Contains(actor) && !actor.Equals(hitTransform);
-            }
-
-            GetBullet(hitPoint, (closeEnemy.HitPoint - hitPoint).normalized);
+            GetBullet(target.HitPoint, (closeEnemy.HitPoint - target.HitPoint).normalized);
         }
-        
+
         private void GetBullet(Vector3 position, Vector3 direction)
         {
             _world.Bullets[_config]
@@ -155,8 +161,9 @@ namespace AK.SpaceMarine.Weapons
 
         private void Trail(bool flag)
         {
-            if (_trailParticle == null) return;
-            
+            if (_trailParticle == null)
+                return;
+
             if (flag)
                 _trailParticle.Play(true);
             else

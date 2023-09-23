@@ -11,7 +11,7 @@ namespace AK.SpaceMarine
 {
     public interface IWorld : IDisposable
     {
-        ICollection<Actor> Actors { get; }
+        HashSet<Actor> Actors { get; }
 
         IHero Hero { get; set; }
 
@@ -27,16 +27,16 @@ namespace AK.SpaceMarine
 
         int GetActorCount<T>();
 
-        bool TryGetActorFirst<T>(Func<T, bool> func, out T result);
+        bool TryGetActorFirst<T>(Predicate<T> match, out T result);
 
-        bool TryGetActorNearest<T>(IRange range, Func<T, bool> func, out T result) where T : IPosition;
+        bool TryGetActorNearest<T>(IRange range, Predicate<T> match, out T result) where T : IPosition;
 
         void SaveData(UserData userData);
     }
 
     public class World : IWorld
     {
-        public ICollection<Actor> Actors { get; }
+        public HashSet<Actor> Actors { get; }
 
         public IHero Hero { get; set; }
 
@@ -93,14 +93,14 @@ namespace AK.SpaceMarine
             return count;
         }
 
-        public bool TryGetActorFirst<T>(Func<T, bool> func, out T result)
+        public bool TryGetActorFirst<T>(Predicate<T> match, out T result)
         {
             foreach (var actor in Actors)
             {
                 if (actor is not T typeActor)
                     continue;
 
-                if (!func(typeActor))
+                if (!match(typeActor))
                     continue;
 
                 result = typeActor;
@@ -111,7 +111,7 @@ namespace AK.SpaceMarine
             return false;
         }
 
-        public bool TryGetActorNearest<T>(IRange range, Func<T, bool> func, out T result) where T : IPosition
+        public bool TryGetActorNearest<T>(IRange range, Predicate<T> match, out T result) where T : IPosition
         {
             (T actor, float distance) nearest = default;
 
@@ -120,7 +120,7 @@ namespace AK.SpaceMarine
                 if (actor is not T typeActor)
                     continue;
 
-                if (!func(typeActor))
+                if (!match(typeActor))
                     continue;
 
                 float distance = (typeActor.Position - range.Position).sqrMagnitude;

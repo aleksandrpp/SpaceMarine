@@ -13,6 +13,8 @@ namespace AK.SpaceMarine.Actors
         private float _hp, _spawnCooldown;
         private Composite _tree;
 
+        #region Bindings
+
         public override void Bind(IWorld world)
         {
             _world = world;
@@ -22,6 +24,10 @@ namespace AK.SpaceMarine.Actors
         {
             _config = config;
         }
+
+        #endregion
+
+        #region Parts
 
         public Vector3 HitPoint => _bodyCenter.position;
 
@@ -36,8 +42,10 @@ namespace AK.SpaceMarine.Actors
         {
             data.Score = _config.XpReward;
         }
-        
-        public string LabelText => $"{(int)_hp}";
+
+        public string LabelText => $"{(int) _hp}";
+
+        #endregion
 
         private void Start()
         {
@@ -56,17 +64,17 @@ namespace AK.SpaceMarine.Actors
         {
             _tree.Execute();
         }
-        
+
         private Status Alive()
         {
             if (_hp > 0)
                 return Status.Success;
-            
+
             _world.Remove(this);
 
             return Status.Failure;
         }
-        
+
         private Status CheckHero()
         {
             if (_world.Hero?.Active ?? false)
@@ -74,16 +82,16 @@ namespace AK.SpaceMarine.Actors
 
             return Status.Failure;
         }
-        
+
         private Status SpawnEnemy()
         {
             _spawnCooldown -= Time.deltaTime;
-            
+
             if (_spawnCooldown <= 0 && _config.SpawnLimit > _world.GetActorCount<Enemy>())
             {
                 _world.CreateActor(
                     _config.EnemyConfigs[Random.Range(0, _config.EnemyConfigs.Length)], NearPoint(1.4f), Rotation);
-                
+
                 _spawnCooldown = 1 / _config.SpawnRate;
                 return Status.Success;
             }
